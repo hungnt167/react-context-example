@@ -1,26 +1,51 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import ThemeContext, {themes} from './ThemeContext';
+import {Toolbar} from './Toolbar';
+import {Counter} from './Counter';
+import {H3} from './H3';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+class App extends React.Component {
+  
+  constructor(props) {
+    super(props);
+    this.state = {
+      theme: localStorage.getItem('theme') || 'dark'
+    }
+  } 
+  
+  changeTheme() {
+    let newTheme = this.state.theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('theme', newTheme);
+    this.setState({ theme: newTheme });
+  }
+
+  refresh() {
+    window.location.reload();
+  }
+  render() {
+    return (
+      <ThemeContext.Provider value={themes[this.state.theme]}>
+        <ThemeContext.Consumer>
+          {(themeContext) => (
+              <div className="App">
+                <header className="App-header" style={{
+                  backgroundColor: themeContext.backgroundColor
+                }}>
+                  <H3 title="ThemeProvider"/>
+                  <Toolbar 
+                    onClickChangeTheme={() => this.changeTheme() }
+                    onClickRefresh={() => this.refresh() }
+                  />
+                  <Counter/>
+                </header>
+              </div>
+          )}
+        </ThemeContext.Consumer>
+      </ThemeContext.Provider>
+    );
+  }
 }
 
 export default App;
